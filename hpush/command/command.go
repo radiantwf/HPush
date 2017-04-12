@@ -9,7 +9,7 @@ import (
 
 var Commands = []*Command{
 	cmdVersion,
-	cmdConnectionManager,
+	cmdConnection,
 }
 
 type Command struct {

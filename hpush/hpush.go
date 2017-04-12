@@ -1,18 +1,22 @@
 package main
 
 import (
-	"HPush/command"
+	"HPush/hpush/command"
+	"HPush/hpush/common"
 	"flag"
 	"fmt"
 	"io"
 	"math/rand"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 	"text/template"
 	"time"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/facebookgo/inject"
 )
 
 var server *string
@@ -31,6 +35,18 @@ func setExitStatus(n int) {
 }
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	config, err := common.NewConfig()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	if err := inject.Populate(&config); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
 	rand.Seed(time.Now().UnixNano())
 	flag.Usage = usage
 	flag.Parse()
