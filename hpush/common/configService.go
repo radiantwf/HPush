@@ -2,7 +2,6 @@ package common
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 )
 
@@ -19,18 +18,6 @@ type ConfigJSONStruct struct {
 type ConfigStruct struct {
 }
 
-// ProvinceInfoStruct 定义
-type ProvinceInfoStruct struct {
-	province string
-	area     AreaStruct
-}
-
-// AreaStruct 定义
-type AreaStruct struct {
-	longitude [2]float64
-	latitude  [2]float64
-}
-
 // NewConfig 定义
 func NewConfig() (config ConfigService, err error) {
 	var jsonStruct ConfigJSONStruct
@@ -41,8 +28,6 @@ func NewConfig() (config ConfigService, err error) {
 	}
 	StructDeepCopy(&jsonStruct, config.configStruct)
 
-	fmt.Println("当前配置文件信息为：")
-	fmt.Println(*config.configStruct)
 	return
 }
 

@@ -17,6 +17,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/facebookgo/inject"
+	"github.com/golang/glog"
 )
 
 var server *string
@@ -35,6 +36,7 @@ func setExitStatus(n int) {
 }
 
 func main() {
+	glog.MaxSize = 1024 * 1024 * 32
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	config, err := common.NewConfig()
@@ -131,6 +133,7 @@ func printUsage(w io.Writer) {
 
 func usage() {
 	printUsage(os.Stderr)
+	fmt.Fprintf(os.Stderr, "For Logging, use \"hpush [logging_options] [command]\". The logging options are:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
 }
