@@ -1,16 +1,20 @@
 package nonpersistent
 
-type RestConnection struct {
+type RestService struct {
 }
 
-func (c *RestConnection) Port() (port int) {
+func (s *RestService) Init() (err error) {
+	return
+}
+
+func (s *RestService) Port() (port int) {
 	return 0
 }
 
-func (c *RestConnection) IsValid() (ret bool) {
+func (s *RestService) IsValid() (ret bool) {
 	return false
 }
 
-func (c *RestConnection) StartServe() (err error) {
+func (s *RestService) StartServe() (err error) {
 	return
 }
