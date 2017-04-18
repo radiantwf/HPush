@@ -3,6 +3,7 @@ package main
 import (
 	"HPush/hpush/command"
 	"HPush/hpush/common"
+	"HPush/hpush/common/data/crypto"
 	"fmt"
 	"math/rand"
 	"os"
@@ -29,6 +30,15 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+	key, err := crypto.GenRsaPrivateKey()
+	fmt.Println(key)
+	pubkey, err := crypto.GenRsaPublicKey(key)
+	fmt.Println(pubkey)
+	buf, _ := crypto.RsaCipher(pubkey, []byte("123123123123"))
+	fmt.Println(string(buf))
+	buf2, _ := crypto.RsaDecipher(key, buf)
+	fmt.Println(string(buf2))
+
 	cmd.Init()
 	cmd.Run()
 }
