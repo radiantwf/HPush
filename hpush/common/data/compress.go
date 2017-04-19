@@ -7,15 +7,15 @@ import (
 )
 
 const (
-	Gzip = byte(iota)
-	Bzip2
+	GZIP = byte(iota)
+	BZIP2
 )
 
 func Compress(srcdata []byte, compresstype byte) (desdata []byte, err error) {
 	var buf bytes.Buffer
 	switch compresstype {
-	case Bzip2:
-	case Gzip:
+	case BZIP2:
+	case GZIP:
 		fallthrough
 	default:
 		zw := gzip.NewWriter(&buf)
@@ -32,8 +32,8 @@ func Compress(srcdata []byte, compresstype byte) (desdata []byte, err error) {
 func Decompress(srcdata []byte, compresstype byte) (desdata []byte, err error) {
 	var buf bytes.Buffer
 	switch compresstype {
-	case Bzip2:
-	case Gzip:
+	case BZIP2:
+	case GZIP:
 		fallthrough
 	default:
 		zr, err1 := gzip.NewReader(bytes.NewBuffer(srcdata))
