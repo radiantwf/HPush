@@ -1,6 +1,9 @@
 package persistent
 
-import "sync"
+import (
+	"HPush/hpush/connection/user"
+	"sync"
+)
 
 type ConnectionManager struct {
 	checkList1 map[string]map[string]ConnectionInfo
@@ -30,10 +33,23 @@ func (m *ConnectionManager) DeleteConnection(conn IConnection) {
 	m.mutex.Lock()
 	if ci, exist := m.checkList2[conn]; exist {
 		userkey := ci.UserInfoKeyString()
-		if _, exist := m.checkList1[userkey]; exist {
-			delete(m.checkList1[userkey], ci.guid)
+		if l, exist := m.checkList1[userkey]; exist {
+			delete(l, ci.guid)
 		}
 		delete(m.checkList2, conn)
 	}
 	m.mutex.Unlock()
+}
+
+func (m *ConnectionManager) GetConnectionsByUser(user user.UserInfo) (connections []IConnection) {
+	userkey := user.UserInfoKeyString()
+	if l, exist := m.checkList1[userkey]; exist {
+		connections = make([]IConnection, len(l))
+		i := 0
+		for _, v := range l {
+			connections[i] = v
+			i++
+		}
+	}
+	return
 }
