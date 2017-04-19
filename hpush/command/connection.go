@@ -15,8 +15,8 @@ type ConnectionOptions struct {
 type ConnectionCommand struct {
 	options ConnectionOptions
 	// Flag is a set of flags specific to this command.
-	flag       flag.FlagSet
-	Connection *connection.ConnectionStarter `inject:""`
+	flag   flag.FlagSet
+	Server *connection.ConnectionServer `inject:""`
 }
 
 func (c *ConnectionCommand) Init() {
@@ -53,7 +53,7 @@ func (c *ConnectionCommand) Run(args []string) (err error) {
 	c.flag.Parse(args)
 	// newArgs := c.flag.Args()
 
-	c.Connection.Init()
-	c.Connection.Run()
+	c.Server.Init()
+	c.Server.Run()
 	return
 }

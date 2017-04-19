@@ -11,7 +11,9 @@ import (
 
 const ()
 
-func RsaCipher(publickey string, origData []byte) (cipherData []byte, err error) {
+type RSACrypto struct{}
+
+func (c *RSACrypto) RsaCipher(publickey string, origData []byte) (cipherData []byte, err error) {
 	block, _ := pem.Decode([]byte(publickey))
 	if block == nil {
 		err = errors.New("public key error")
@@ -27,7 +29,7 @@ func RsaCipher(publickey string, origData []byte) (cipherData []byte, err error)
 	return
 }
 
-func RsaDecipher(privatekey string, cipherData []byte) (origData []byte, err error) {
+func (c *RSACrypto) RsaDecipher(privatekey string, cipherData []byte) (origData []byte, err error) {
 	block, _ := pem.Decode([]byte(privatekey))
 	if block == nil {
 		err = errors.New("private key error")
@@ -42,7 +44,7 @@ func RsaDecipher(privatekey string, cipherData []byte) (origData []byte, err err
 	return
 }
 
-func GenRsaPrivateKey() (privatekey string, err error) {
+func (c *RSACrypto) GenRsaPrivateKey() (privatekey string, err error) {
 	var buf bytes.Buffer
 	// 生成私钥文件
 	privateKey, err1 := rsa.GenerateKey(rand.Reader, 2048)
@@ -63,7 +65,7 @@ func GenRsaPrivateKey() (privatekey string, err error) {
 	return
 }
 
-func GenRsaPublicKey(privatekey string) (publickey string, err error) {
+func (c *RSACrypto) GenRsaPublicKey(privatekey string) (publickey string, err error) {
 	var buf bytes.Buffer
 	block, _ := pem.Decode([]byte(privatekey))
 	if block == nil {

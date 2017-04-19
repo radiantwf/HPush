@@ -39,7 +39,9 @@ var DefaultCryptionOption = CryptionOption{
 	Mode:      CBC,
 }
 
-func CipherPKCS5Padding(key []byte, option CryptionOption, origData []byte) (cipherData []byte, err error) {
+type SymmetricCrypto struct{}
+
+func (c *SymmetricCrypto) CipherPKCS5Padding(key []byte, option CryptionOption, origData []byte) (cipherData []byte, err error) {
 	var block cipher.Block
 	switch option.Algorithm {
 	case DES:
@@ -56,9 +58,9 @@ func CipherPKCS5Padding(key []byte, option CryptionOption, origData []byte) (cip
 
 	switch option.Padding {
 	case PKCS5PADDING:
-		origData = PKCS5Padding(origData, blockSize)
+		origData = c._PKCS5Padding(origData, blockSize)
 	case PKCS7PADDING:
-		origData = PKCS7Padding(origData, blockSize)
+		origData = c._PKCS7Padding(origData, blockSize)
 	case NOPADDING:
 	default:
 		err = errors.New("Cryption padding option error")
@@ -91,7 +93,7 @@ func CipherPKCS5Padding(key []byte, option CryptionOption, origData []byte) (cip
 	return
 }
 
-func DecipherPKCS5Padding(key []byte, option CryptionOption, cipherData []byte) (origData []byte, err error) {
+func (c *SymmetricCrypto) DecipherPKCS5Padding(key []byte, option CryptionOption, cipherData []byte) (origData []byte, err error) {
 	var block cipher.Block
 	switch option.Algorithm {
 	case DES:
@@ -130,9 +132,9 @@ func DecipherPKCS5Padding(key []byte, option CryptionOption, cipherData []byte) 
 
 	switch option.Padding {
 	case PKCS5PADDING:
-		origData = PKCS5UnPadding(origData)
+		origData = c._PKCS5UnPadding(origData)
 	case PKCS7PADDING:
-		origData = PKCS7UnPadding(origData)
+		origData = c._PKCS7UnPadding(origData)
 	case NOPADDING:
 	default:
 		err = errors.New("Cryption padding option error")
@@ -140,47 +142,21 @@ func DecipherPKCS5Padding(key []byte, option CryptionOption, cipherData []byte) 
 	return
 }
 
-func AesCipherNoPadding(key []byte, origData []byte) (cipherData []byte, err error) {
-	block, err1 := aes.NewCipher(key)
-	if err1 != nil {
-		err = err1
-		return
-	}
-	blockSize := block.BlockSize()
-	blockMode := cipher.NewCBCEncrypter(block, key[:blockSize])
-	cipherData = make([]byte, len(origData))
-	blockMode.CryptBlocks(cipherData, origData)
-	return
+func (c *SymmetricCrypto) _PKCS5Padding(cipherData []byte, blockSize int) []byte {
+	return c._PKCS7Padding(cipherData, blockSize)
 }
 
-func AesDecipherNoPadding(key []byte, cipherData []byte) (origData []byte, err error) {
-	block, err1 := aes.NewCipher(key)
-	if err1 != nil {
-		err = err1
-		return
-	}
-	blockSize := block.BlockSize()
-	blockMode := cipher.NewCBCDecrypter(block, key[:blockSize])
-	origData = make([]byte, len(cipherData))
-	blockMode.CryptBlocks(origData, cipherData)
-	return
+func (c *SymmetricCrypto) _PKCS5UnPadding(origData []byte) []byte {
+	return c._PKCS7UnPadding(origData)
 }
 
-func PKCS5Padding(cipherData []byte, blockSize int) []byte {
-	return PKCS7Padding(cipherData, blockSize)
-}
-
-func PKCS5UnPadding(origData []byte) []byte {
-	return PKCS7UnPadding(origData)
-}
-
-func PKCS7Padding(cipherData []byte, blockSize int) []byte {
+func (c *SymmetricCrypto) _PKCS7Padding(cipherData []byte, blockSize int) []byte {
 	padding := blockSize - len(cipherData)%blockSize
 	padData := bytes.Repeat([]byte{byte(padding)}, padding)
 	return append(cipherData, padData...)
 }
 
-func PKCS7UnPadding(origData []byte) []byte {
+func (c *SymmetricCrypto) _PKCS7UnPadding(origData []byte) []byte {
 	length := len(origData)
 	unpadding := int(origData[length-1])
 	return origData[:(length - unpadding)]

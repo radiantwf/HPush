@@ -14,8 +14,11 @@ const (
 	MD5
 	SHA1
 )
+const DEFAULT_CHECK_TYPE = CRC32
 
-func GetCheckingCode(data []byte, checktype byte) (code uint32, err error) {
+type Check struct{}
+
+func (c *Check) GetCheckingCode(data []byte, checktype byte) (code uint32, err error) {
 	switch checktype {
 	case ADLER32:
 		code = adler32.Checksum(data)

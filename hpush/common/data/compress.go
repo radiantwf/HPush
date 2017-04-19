@@ -11,7 +11,11 @@ const (
 	BZIP2
 )
 
-func Compress(srcdata []byte, compresstype byte) (desdata []byte, err error) {
+const DEFAULT_COMPRESS_TYPE = GZIP
+
+type Compress struct{}
+
+func (c *Compress) Compress(srcdata []byte, compresstype byte) (desdata []byte, err error) {
 	var buf bytes.Buffer
 	switch compresstype {
 	case BZIP2:
@@ -29,7 +33,7 @@ func Compress(srcdata []byte, compresstype byte) (desdata []byte, err error) {
 	return
 }
 
-func Decompress(srcdata []byte, compresstype byte) (desdata []byte, err error) {
+func (c *Compress) Decompress(srcdata []byte, compresstype byte) (desdata []byte, err error) {
 	var buf bytes.Buffer
 	switch compresstype {
 	case BZIP2:
