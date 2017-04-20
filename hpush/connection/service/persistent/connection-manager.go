@@ -2,6 +2,7 @@ package persistent
 
 import (
 	"HPush/hpush/connection/user"
+	"errors"
 	"sync"
 )
 
@@ -18,38 +19,56 @@ func (m *ConnectionManager) Init() {
 	m.mutex.Unlock()
 }
 
-func (m *ConnectionManager) AppendConnection(ci ConnectionInfo) {
-	m.mutex.Lock()
-	userkey := ci.UserInfoKeyString()
-	if _, exist := m.checkList2[userkey]; !exist {
-		m.checkList1[userkey] = make(map[string]ConnectionInfo)
-	}
-	m.checkList1[userkey][ci.guid] = ci
-	m.checkList2[ci.connection] = ci
-	m.mutex.Unlock()
+// func (m *ConnectionManager) AppendConnection(ci ConnectionInfo) (err error) {
+// 	if ci.User == nil {
+// 		err = errors.New("ConnectionInfo的用户信息不能为空")
+// 		return
+// 	}
+// 	m.mutex.Lock()
+// 	userkey := ci.User.UserInfoKeyString()
+// 	if _, exist := m.checkList2[userkey]; !exist {
+// 		m.checkList1[userkey] = make(map[string]ConnectionInfo)
+// 	}
+// 	m.checkList1[userkey][ci.Guid] = ci
+// 	m.checkList2[ci.Connection] = ci
+// 	m.mutex.Unlock()
+// 	return
+// }
+func (m *ConnectionManager) AppendNewConnection(ci ConnectionInfo) (err error) {
+	return
 }
 
-func (m *ConnectionManager) DeleteConnection(conn IConnection) {
+func (m *ConnectionManager) DeleteConnection(conn IConnection) (err error) {
 	m.mutex.Lock()
 	if ci, exist := m.checkList2[conn]; exist {
-		userkey := ci.UserInfoKeyString()
+		userkey := ci.User.UserInfoKeyString()
 		if l, exist := m.checkList1[userkey]; exist {
-			delete(l, ci.guid)
+			delete(l, ci.Guid)
 		}
 		delete(m.checkList2, conn)
 	}
 	m.mutex.Unlock()
+	return
 }
 
-func (m *ConnectionManager) GetConnectionsByUser(user user.UserInfo) (connections []IConnection) {
+func (m *ConnectionManager) GetConnectionsByUser(user user.UserInfo) (ciList []ConnectionInfo, err error) {
 	userkey := user.UserInfoKeyString()
 	if l, exist := m.checkList1[userkey]; exist {
-		connections = make([]IConnection, len(l))
+		ciList = make([]ConnectionInfo, len(l))
 		i := 0
 		for _, v := range l {
-			connections[i] = v
+			ciList[i] = v
 			i++
 		}
+	}
+	return
+}
+
+func (m *ConnectionManager) GetCIByConn(conn IConnection) (ci ConnectionInfo, err error) {
+	if i, exist := m.checkList2[conn]; exist {
+		ci = i
+	} else {
+		err = errors.New("无法找到这个链接")
 	}
 	return
 }

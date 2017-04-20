@@ -1,14 +1,19 @@
 package persistent
 
 import (
+	"HPush/hpush/common/guid"
 	"HPush/hpush/connection/user"
-	"time"
 )
 
 type ConnectionInfo struct {
-	guid string
-	user.UserInfo
-	FirstConnectedTime time.Time
-	LastConnectedTime  time.Time
-	connection         IConnection
+	Guid       string
+	User       *user.UserInfo
+	Connection IConnection
+}
+
+func NewConnectionInfo(conn IConnection) (ci ConnectionInfo) {
+	ci = ConnectionInfo{Guid: (&guid.GUID{}).NewGUID(),
+		Connection: conn,
+	}
+	return
 }

@@ -25,7 +25,8 @@ var machineId = readMachineID()
 // property.
 //
 // http://www.mongodb.org/display/DOCS/Object+IDs
-type GUID string
+type GUID struct {
+}
 
 // readMachineId generates machine id and puts it into the machineId global
 // variable. If this function fails to get the hostname, it will cause
@@ -44,7 +45,6 @@ func readMachineID() []byte {
 	hw := md5.New()
 	hw.Write([]byte(hostname))
 	copy(id, hw.Sum(nil))
-	fmt.Println("readMachineId:" + string(id))
 	return id
 }
 
@@ -54,7 +54,7 @@ func readMachineID() []byte {
 // 2byte pid
 // 3byte 自增ID
 // 返回16进制对应的字符串
-func NewGUID() string {
+func (g *GUID) NewGUID() string {
 	var b [12]byte
 	// Timestamp, 4 bytes, big endian
 	binary.BigEndian.PutUint32(b[:], uint32(time.Now().Unix()))

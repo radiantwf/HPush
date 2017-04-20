@@ -1,4 +1,4 @@
-package data
+package compress
 
 import (
 	"bytes"

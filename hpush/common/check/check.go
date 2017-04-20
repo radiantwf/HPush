@@ -1,4 +1,4 @@
-package data
+package check
 
 import (
 	"crypto/md5"
