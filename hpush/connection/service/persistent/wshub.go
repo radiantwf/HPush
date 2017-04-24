@@ -20,10 +20,20 @@ type WSHub struct {
 	out chan *outbound
 
 	// Register requests from the connections.
+	ping chan *ping
+
+	// Register requests from the connections.
 	register chan *WSConnection
 
 	// Unregister requests from connections.
 	unregister chan *WSConnection
+}
+
+//  Ping data from a WSConnection.
+type ping struct {
+	conn     *WSConnection
+	pingdata []byte
+	pingtime *time.Time
 }
 
 // Inbound messages from a WSConnection.
@@ -52,6 +62,8 @@ func (h *WSHub) run(s *WSService) {
 			var conn IConnection
 			conn = c
 			h.Manager.DeleteConnection(conn)
+		case p := <-h.ping:
+			go h.pong(p.pingtime, p.pingdata, p.conn)
 		case in := <-h.in:
 			if s.submitCallback != nil {
 				var conn IConnection
@@ -66,7 +78,7 @@ func (h *WSHub) run(s *WSService) {
 	}
 }
 
-// write 定义
+// write
 func (h *WSHub) write(message []byte, c *WSConnection) {
 	if err := c.write(websocket.TextMessage, message); err != nil {
 		log.Printf("error: %v", err)
@@ -74,6 +86,19 @@ func (h *WSHub) write(message []byte, c *WSConnection) {
 	}
 	now := time.Now()
 	c.lastCommunicationTime = &now
+	return
+}
+
+// write
+func (h *WSHub) pong(pingtime *time.Time, data []byte, c *WSConnection) {
+	if pingtime == c.lastPingTime {
+		if err := c.write(websocket.PongMessage, data); err != nil {
+			log.Printf("error: %v", err)
+			return
+		}
+		now := time.Now()
+		c.lastCommunicationTime = &now
+	}
 	return
 }
 

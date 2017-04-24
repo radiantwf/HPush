@@ -15,6 +15,8 @@ type WSConnection struct {
 	connectedTime *time.Time
 	// Last communication time.
 	lastCommunicationTime *time.Time
+	// Last ping time.
+	lastPingTime *time.Time
 }
 
 func (c *WSConnection) GetConnectedTime() (t *time.Time) {
@@ -48,6 +50,9 @@ func (c *WSConnection) readPump(h WSHub) {
 			}
 			break
 		}
+		// if messagetype == websocket.PingMessage {
+		// 	h.ping <- &ping{conn: c, pingdata: message, pingtime: &now}
+		// } else
 		if messagetype == websocket.TextMessage || messagetype == websocket.BinaryMessage {
 			h.in <- &inbound{conn: c, message: message, time: &now}
 		}
