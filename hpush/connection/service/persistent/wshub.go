@@ -13,6 +13,8 @@ type WSHub struct {
 	// Registered connections.
 	Manager *ConnectionManager `inject:""`
 
+	ReceiveHandler *ReceiveHandler `inject:""`
+
 	// Inbound messages.
 	in chan *inbound
 
@@ -65,10 +67,10 @@ func (h *WSHub) run(s *WSService) {
 		case p := <-h.ping:
 			go h.pong(p.pingtime, p.pingdata, p.conn)
 		case in := <-h.in:
-			if s.submitCallback != nil {
-				var conn IConnection
-				conn = in.conn
-				if ci, err := h.Manager.GetCIByConn(conn); err != nil {
+			var conn IConnection
+			conn = in.conn
+			if ci, err := h.Manager.GetCIByConn(conn); err != nil {
+				if s.submitCallback != nil {
 					go s.submitCallback(in.message, ci)
 				}
 			}

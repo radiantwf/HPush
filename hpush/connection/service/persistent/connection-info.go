@@ -6,14 +6,18 @@ import (
 )
 
 type ConnectionInfo struct {
-	Guid       string
+	GUID       string
 	User       *user.UserInfo
 	Connection IConnection
 }
 
 func NewConnectionInfo(conn IConnection) (ci ConnectionInfo) {
-	ci = ConnectionInfo{Guid: (&guid.GUID{}).NewGUID(),
+	ci = ConnectionInfo{GUID: (&guid.GUID{}).NewGUID(),
 		Connection: conn,
 	}
 	return
+}
+
+func (c *ConnectionInfo) AppendUserInfo(appid, username, group string) {
+	c.User = user.New(appid, username, group)
 }
